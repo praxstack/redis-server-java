@@ -1,0 +1,104 @@
+package com.praxstack.redis;
+
+import org.junit.jupiter.api.Test;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class CommandDispatcherTest {
+
+    private String dispatch(CommandDispatcher d, String... args) {
+        return new String(d.dispatch(List.of(args)), StandardCharsets.UTF_8);
+    }
+
+    @Test
+    void pingReturnsPong() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+PONG\r\n", dispatch(d, "PING"));
+    }
+
+    @Test
+    void pingWithMessageEchoesBulk() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("$5\r\nhello\r\n", dispatch(d, "PING", "hello"));
+    }
+
+    @Test
+    void echoReturnsArgumentAsBulk() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("$3\r\nhey\r\n", dispatch(d, "ECHO", "hey"));
+    }
+
+    @Test
+    void setThenGetReturnsValue() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+OK\r\n", dispatch(d, "SET", "k", "v"));
+        assertEquals("$1\r\nv\r\n", dispatch(d, "GET", "k"));
+    }
+
+    @Test
+    void getMissingReturnsNullBulk() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("$-1\r\n", dispatch(d, "GET", "missing"));
+    }
+
+    @Test
+    void delReturnsCountOfRemovedKeys() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "a", "1");
+        dispatch(d, "SET", "b", "2");
+        assertEquals(":2\r\n", dispatch(d, "DEL", "a", "b", "c"));
+    }
+
+    @Test
+    void existsCountsPresentKeys() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "a", "1");
+        assertEquals(":1\r\n", dispatch(d, "EXISTS", "a", "b"));
+    }
+
+    @Test
+    void incrIncrementsAndReturnsNewValue() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals(":1\r\n", dispatch(d, "INCR", "counter"));
+        assertEquals(":2\r\n", dispatch(d, "INCR", "counter"));
+    }
+
+    @Test
+    void unknownCommandReturnsError() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        String out = dispatch(d, "FOOBAR");
+        assertTrue(out.startsWith("-ERR unknown command"), out);
+    }
+
+    @Test
+    void setWithPxExpiresKey() throws InterruptedException {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "k", "v", "PX", "30");
+        Thread.sleep(80L);
+        assertEquals("$-1\r\n", dispatch(d, "GET", "k"));
+    }
+
+    @Test
+    void commandIntrospectionReturnsEmptyArray() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("*0\r\n", dispatch(d, "COMMAND"));
+        assertEquals("*0\r\n", dispatch(d, "CONFIG", "GET", "maxmemory"));
+    }
+
+    @Test
+    void commandNamesAreCaseInsensitive() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+PONG\r\n", dispatch(d, "ping"));
+        assertEquals("+PONG\r\n", dispatch(d, "Ping"));
+    }
+
+    @Test
+    void incrOnBadValueReturnsTypedError() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "k", "notanumber");
+        assertEquals("-ERR value is not an integer or out of range\r\n", dispatch(d, "INCR", "k"));
+    }
+}
