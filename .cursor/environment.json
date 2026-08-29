@@ -1,0 +1,21 @@
+{
+  "name": "Redis Server Java",
+  "user": "ubuntu",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "install": "./scripts/cloud-agent-install.sh",
+  "terminals": [
+    {
+      "name": "Redis Server",
+      "command": "java -jar target/redis-server-java-1.0.0.jar",
+      "description": "RESP2-compatible Redis server on port 6379"
+    }
+  ],
+  "ports": [
+    {
+      "name": "redis",
+      "port": 6379
+    }
+  ]
+}
