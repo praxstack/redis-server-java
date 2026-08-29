@@ -51,18 +51,53 @@ install_pstack() {
   done
 }
 
+link_gstack_flat_cursor_skills() {
+  # gstack --host cursor installs gstack-* prefixed dirs; Cursor slash commands
+  # use the folder name under ~/.cursor/skills/, so create flat aliases (/qa not /gstack-qa).
+  local cursor_skills="${HOME}/.cursor/skills"
+  local gstack_skills_dir="$1/.cursor/skills"
+  local created=0
+
+  for skill_dir in "$gstack_skills_dir"/gstack-*/; do
+    [ -d "$skill_dir" ] || continue
+    local base flat target
+    base=$(basename "$skill_dir")
+    flat="${base#gstack-}"
+    [ -z "$flat" ] || [ "$flat" = "$base" ] && continue
+    target="$cursor_skills/$flat"
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+      echo "    SKIP flat alias (exists): $flat"
+      continue
+    fi
+    ln -sfn "$skill_dir" "$target"
+    created=$((created + 1))
+  done
+
+  # Drop prefixed symlinks so Cursor does not show duplicates (/qa and /gstack-qa).
+  for item in "$cursor_skills"/gstack-*/; do
+    [ -L "$item" ] || continue
+    rm -f "$item"
+  done
+
+  find "$gstack_skills_dir" -name 'SKILL.md' -exec chmod 644 {} \; 2>/dev/null || true
+  echo "    Linked $created flat gstack skills in ~/.cursor/skills"
+}
+
 install_gstack() {
   echo "==> Installing gstack (Garry Tan's engineering team)..."
   if ! command -v bun >/dev/null 2>&1; then
     curl -fsSL https://bun.sh/install | bash
-    export PATH="$HOME/.bun/bin:$PATH"
   fi
-  local gstack_dir="${TMPDIR:-/tmp}/gstack"
+  export PATH="${HOME}/.bun/bin:${PATH}"
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local gstack_dir="${script_dir}/gstack"
   if [ ! -d "$gstack_dir/.git" ]; then
     git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git "$gstack_dir"
   fi
   # Cursor caveat: gstack issue #2361 — ./setup --host cursor is required (not claude/codex)
-  (cd "$gstack_dir" && ./setup --host cursor)
+  (cd "$gstack_dir" && ./setup --host cursor --no-prefix)
+  link_gstack_flat_cursor_skills "$gstack_dir"
 }
 
 install_agent_browser_cli() {
