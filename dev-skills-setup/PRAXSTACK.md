@@ -73,6 +73,44 @@ discover → interrogate/spec → plan → implement → review → security →
 | **Spec** | @fission-ai/openspec | `/opsx-propose` | Formal spec-driven changes |
 | **Graph** | graphifyy | `/graphify` | Codebase knowledge graph |
 
+### Prax personal layer (skills-and-personas)
+
+Source: [praxstack/skills-and-personas](https://github.com/praxstack/skills-and-personas). Installed by `install-prax-personal-layer.sh` (called from `install-pro-skills.sh`). Clones to `dev-skills-setup/skills-and-personas/` (gitignored, like gstack).
+
+| Category | Skills | Slash command | When to use |
+|----------|--------|---------------|-------------|
+| **Reasoning depth** | kingmode, super-mode-core, ultrathink-frontend | `/kingmode` | Architecture, scalability, security, production decisions |
+| **Backend (Java)** | backend-pe-java, backend-pe, backend-architecture-standards | `/backend-pe-java` | This repo — JVM concurrency, RESP server design |
+| **Team roles** | constellation-team, principal-engineer, product-manager, qa-security-engineer, devops-sre-engineer, frontend-uiux-designer | `/constellation-team` | Cross-functional planning with role labels |
+| **Teaching** | teach-pro-max, techtutor, gabriel-petersson-topdown-mentor, lecture-alchemist | `/teach-pro-max` | Adaptive lessons, DSA mentoring |
+| **Documents** | blueprint-creator, spec-creator, transcript-pipeline | `/spec-creator` | Specs, blueprints, transcript pipelines |
+| **Personal** | chronicle, idea-capturer, concept-cartographer | `/chronicle` | Journal intelligence, idea capture |
+| **Ops loops** | superimprove, coding-agent-leadership-principles, cross-agent-handoff | `/superimprove` | Bounded audit-fix loops, agent handoffs |
+| **Orchestrators** | apex-autonomous-mode, autonomous-orchestrion, orchestrion-universal-agent-router | `/orchestrion-universal-agent-router` | Multi-agent routing (advanced) |
+
+**41 canonical skills** in `new-skills/` plus 4 extra portable skills (`teach-pro-max`, `superimprove`, `coding-agent-leadership-principles`, `cross-agent-handoff`). Personas in `personas/` and `md-personas/` are source material — invoke via the distilled skills above, not by copying persona files.
+
+**Prompt workflows (paste, not slash):** `dev-skills-setup/skills-and-personas/prompts/high-end-operator/` — lifecycle paste prompts that invoke gstack/superpowers (Think → Plan → Build → Review → Test → Ship → Reflect). See `CATALOG.md`.
+
+**Optional rules:** `.clinerules/` from the repo installs as `~/.cursor/rules/prax-*.mdc` (`alwaysApply: false`). Enable per-project when needed.
+
+**Conflict policy — do NOT duplicate:**
+
+| Already installed (PraxStack core) | skills-and-personas equivalent | Action |
+|-----------------------------------|-------------------------------|--------|
+| gstack (`/office-hours`, `/ship`, `/qa`) | high-end-operator paste prompts | Use gstack slash commands; prompts reference them |
+| superpowers (auto-triggers) | autonomous-orchestrion | Pick one orchestrator per task |
+| pstack (`/poteto-mode`) | kingmode, super-mode-core | Complementary: kingmode for depth, pstack for daily rigor |
+| `/goal` (Cursor native) | — | Keep using Cursor's `/goal` for durable objectives |
+
+**Install only this layer:**
+
+```bash
+./dev-skills-setup/install-prax-personal-layer.sh
+# or individual skill:
+npx skills add praxstack/skills-and-personas --skill backend-pe-java
+```
+
 ### Explicitly NOT bulk-installed
 
 | Source | Why skipped |
@@ -229,7 +267,9 @@ cd dev-skills-setup/gstack && ./setup --host cursor --no-prefix
 | File | Purpose |
 |------|---------|
 | `install-pro-skills.sh` | Full layered installer (global + project tools) |
+| `install-prax-personal-layer.sh` | Prax personal skills from skills-and-personas |
 | `PRAXSTACK.md` | This architecture doc |
 | `WORKFLOW.md` | Daily workflow recipes |
 | `gstack/` | Vendored gstack clone (installer manages) |
+| `skills-and-personas/` | Vendored Prax personal skills clone (installer manages) |
 | `cursor-plugins/` | Vendored cursor/plugins for pstack |

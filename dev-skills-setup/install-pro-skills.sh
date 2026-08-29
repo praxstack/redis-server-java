@@ -231,6 +231,13 @@ install_project_tools() {
   fi
 }
 
+install_prax_personal_layer() {
+  echo "==> Installing Prax personal layer (skills-and-personas)..."
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  bash "${script_dir}/install-prax-personal-layer.sh"
+}
+
 # --- Layer 0: Discovery (install FIRST) ---
 echo "=== Layer 0: Discovery ==="
 install_skillpack vercel-labs/skills --skill find-skills
@@ -282,6 +289,10 @@ echo "=== MCP and pstack configuration ==="
 install_mcp_context7
 install_pstack_models
 
+# --- Prax personal layer (skills-and-personas) ---
+echo "=== Prax personal layer ==="
+install_prax_personal_layer
+
 # --- Project-level tools (OpenSpec, graphify) ---
 install_project_tools
 
@@ -311,5 +322,6 @@ echo "  6. Pick ONE primary workflow: /poteto-mode, superpowers, /office-hours, 
 echo "  7. /find-skills <topic>        (discover more skills on demand)"
 echo "  8. uv tool install specify-cli (Spec Kit — formal planning mode)"
 echo "  9. /graphify .                 (build knowledge graph if graphify installed)"
+echo " 10. /kingmode or /backend-pe-java  (Prax personal layer — see PRAXSTACK.md)"
 echo ""
 echo "See PRAXSTACK.md for architecture and WORKFLOW.md for daily workflows."
