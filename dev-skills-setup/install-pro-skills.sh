@@ -114,7 +114,7 @@ install_skillpack mattpocock/skills --skill '*'
 install_skillpack obra/superpowers --skill '*'
 install_skillpack addyosmani/agent-skills --skill '*'
 install_skillpack vercel-labs/agent-skills --skill '*'
-install_skillpack anthropics/skills --skill mcp-builder --skill skill-creator --skill webapp-testing
+install_skillpack anthropics/skills --skill mcp-builder --skill skill-creator --skill webapp-testing --skill frontend-design
 install_pstack
 install_gstack
 install_skillpack vercel-labs/agent-browser --skill agent-browser
