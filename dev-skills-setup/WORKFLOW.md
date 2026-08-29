@@ -2,6 +2,8 @@
 
 A layered, composable agent skills setup for serious engineering work in Cursor Cloud Agents.
 
+**See also:** [PRAXSTACK.md](./PRAXSTACK.md) for full architecture, install locations, conflict warnings, and desktop replication.
+
 **Philosophy:** compose, don't overload. Pick **one primary methodology** per task and pull in other layers situationally.
 
 ## 10-layer pipeline
@@ -32,7 +34,9 @@ flowchart LR
 | **security** | Threat model, audit, fuzz | trailofbits (`semgrep`, `differential-review`, `sharp-edges`) |
 | **browser QA** | Real UI verification | `agent-browser`, `/ce-test-browser`, gstack `/qa` |
 | **ship** | Release, deploy, PR | `/ship`, `/ce-commit-push-pr`, `deploy-to-vercel` |
-| **learn** | Capture knowledge, compound | `/ce-compound`, gstack `/learn`, `knowledge-capture` |
+| **learn** | Capture knowledge, compound | `/ce-compound`, `/learn`, `knowledge-capture` |
+| **research** | Live web, deep dives | `last30days`, `deep-research`, Context7 MCP |
+| **UI quality** | Polish and design | `hallmark`, `frontend-design` |
 
 ## Core 10
 
@@ -51,9 +55,21 @@ The default engineering cartridge — install these, configure once, use daily:
 | 9 | **vercel-labs/agent-skills** | vercel-labs/agent-skills | React/Next/Vercel best practices |
 | 10 | **compound-engineering** | EveryInc/compound-engineering-plugin | Compound loops (`/ce-work`, `/ce-compound`) |
 
+### 2026 selective additions
+
+| Category | Source | When to use |
+|----------|--------|-------------|
+| Research | mvanhorn/last30days-skill, 24601/agent-deep-research | Trends, deep dives |
+| UI quality | nutlope/hallmark | Design polish |
+| Spec | @fission-ai/openspec (`/opsx-propose`) | Formal spec-driven changes |
+| Graph | graphifyy (`/graphify`) | Codebase knowledge graph |
+| MCP | Context7 (`~/.cursor/mcp.json`) | Live library docs |
+
 Native plugin install (optional, richer integration):
 
 ```
+/add-plugin pstack
+/add-plugin superpowers
 /add-plugin compound-engineering
 ```
 
@@ -95,7 +111,7 @@ Native plugin install (optional, richer integration):
 ### Browser QA
 - UI changes → `agent-browser` CLI + skill, or `/ce-test-browser`
 - Full product QA → gstack `/qa`
-- gstack browse → `/gstack-browse` (separate from agent-browser)
+- gstack browse → `/browse` (separate from agent-browser)
 
 ### Ship
 - Release engineer → `/ship` (gstack)
@@ -115,6 +131,8 @@ Install only when your project uses that stack (optional in `install-pro-skills.
 | **Supabase** | supabase/agent-skills | `supabase`, `supabase-postgres-best-practices` |
 | **Cloudflare** | cloudflare/skills | `workers-best-practices`, `wrangler`, `durable-objects` |
 | **AWS** | aws/agent-toolkit-for-aws | `aws-cdk`, `aws-lambda`, `aws-iam`, `amazon-bedrock` |
+| **Remotion** | remotion-dev/skills | `remotion-*` (video projects) |
+| **NVIDIA** | nvidia/skills | GPU/CUDA skills (ML workloads) |
 
 ## microsoft/skills — selective install only
 
@@ -144,9 +162,11 @@ gstack requires the Cursor host adapter:
 cd /tmp/gstack && ./setup --host cursor
 ```
 
-**Caveat:** [gstack issue #2361](https://github.com/garrytan/gstack/issues/2361) — some hooks (e.g. AskUserQuestion) may not register on Cursor until resolved. Core skills (`/office-hours`, `/review`, `/qa`, `/ship`) work via `~/.cursor/skills/gstack-*`.
+**Caveat:** [gstack issue #2361](https://github.com/garrytan/gstack/issues/2361) — some hooks (e.g. AskUserQuestion) may not register on Cursor until resolved.
 
-Verified on this VM: `./setup --host cursor` completes successfully.
+**Flat slash commands:** The installer symlinks `gstack-*` dirs to flat names (`/plan-ceo-review`, `/office-hours`, `/review`, `/qa`, `/ship`). See PRAXSTACK.md.
+
+Verified on this VM: `./setup --host cursor --no-prefix` + flat alias linking completes successfully.
 
 ## agent-browser CLI
 
@@ -161,10 +181,12 @@ agent-browser install --with-deps
 ## One-time setup per environment
 
 ```bash
-./dev-skills-setup/install-pro-skills.sh   # full layered install
+./dev-skills-setup/install-pro-skills.sh   # full layered install (global + project tools)
 /setup-pstack                              # or use pre-written pstack-models.mdc
 /setup-matt-pocock-skills                  # issue tracker, labels, docs path
 uv tool install specify-cli                # Spec Kit formal planning
+/graphify .                                # build knowledge graph (if graphify installed)
+/opsx-propose "your idea"                  # OpenSpec spec-driven workflow
 ```
 
 ## Recommended daily workflows
