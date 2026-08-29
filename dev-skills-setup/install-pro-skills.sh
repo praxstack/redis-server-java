@@ -73,6 +73,7 @@ install_agent_browser_cli() {
     return 0
   fi
   if npm install -g agent-browser --prefix "$AGENT_BROWSER_PREFIX"; then
+    :
   elif npm install -g agent-browser 2>/dev/null; then
     :
   else
