@@ -77,6 +77,34 @@ No external config file — change via constructor args or constants for now.
 
 Send SIGTERM; shutdown hook calls `Server.close()`. In-flight handlers get up to 5 seconds to drain.
 
+## Git branch hygiene
+
+This repository uses **`main`** as the only production branch. There is no `dev` or `deb` branch.
+
+Merged feature branches (e.g. `prax/super-pro-skills-stack-d404`) remain on `origin` until you delete them. If your local checkout is on a stale branch after a PR merge, switch to `main` and clean up:
+
+```bash
+# See where you are
+git status
+git branch -a
+
+# Move to latest main
+git fetch origin
+git checkout main
+git pull origin main
+
+# Delete a merged local branch (example)
+git branch -d prax/super-pro-skills-stack-d404
+
+# Prune remote-tracking refs for deleted upstream branches
+git fetch origin --prune
+
+# Optional: delete a merged remote branch (after PR merge)
+git push origin --delete prax/super-pro-skills-stack-d404
+```
+
+**Cloud Agents** always start from `main` at the latest commit. If you see an old branch name in agent context, it is historical — run the commands above locally to align your machine.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Check |
@@ -84,3 +112,4 @@ Send SIGTERM; shutdown hook calls `Server.close()`. In-flight handlers get up to
 | Connection reset under load | Pool saturated | Server logs `worker pool saturated` |
 | Client disconnect on large payload | Bulk > 512 KiB | `RespParser` IOException |
 | Stale key count in `DBSIZE` | Expired keys not yet swept | `ExpiryManager` sweep; `Store.purgeExpired()` |
+| Agent or IDE on stale branch | Local checkout not updated after PR merge | See **Git branch hygiene** above |
