@@ -59,4 +59,22 @@ class RespParserTest {
         List<String> args = new RespParser(new ByteArrayInputStream(bytes)).next();
         assertEquals("h\u00e9llo", args.get(0));
     }
+
+    @Test
+    void rejectsOversizedBulkString() {
+        int max = 1024;
+        String header = "*1\r\n$" + (max + 1) + "\r\n";
+        RespParser p = new RespParser(new ByteArrayInputStream(header.getBytes(StandardCharsets.US_ASCII)), max);
+        IOException ex = assertThrows(IOException.class, p::next);
+        assertTrue(ex.getMessage().contains("exceeds maximum"));
+    }
+
+    @Test
+    void acceptsBulkStringAtLimit() throws IOException {
+        int max = 64;
+        String payload = "x".repeat(max);
+        String input = "*1\r\n$" + max + "\r\n" + payload + "\r\n";
+        RespParser p = new RespParser(new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII)), max);
+        assertEquals(List.of(payload), p.next());
+    }
 }

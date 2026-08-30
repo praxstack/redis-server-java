@@ -140,4 +140,49 @@ class ServerIntegrationTest {
                 + "\r\n" + ((long) clients * incrPerClient) + "\r\n";
         assertEquals(expected, resp);
     }
+
+    @Test
+    void rejectsConnectionsWhenPoolSaturated() throws Exception {
+        // 1 worker + queue capacity 1: two busy handlers fill pool+queue; third is rejected
+        Server saturated = new Server(0, 1, 1);
+        saturated.start();
+        try {
+            Socket blocker1 = new Socket("127.0.0.1", saturated.boundPort());
+            Socket blocker2 = new Socket("127.0.0.1", saturated.boundPort());
+            // partial command keeps handlers alive without completing
+            blocker1.getOutputStream().write("*1\r\n$4\r\nPING".getBytes(StandardCharsets.UTF_8));
+            blocker1.getOutputStream().flush();
+            blocker2.getOutputStream().write("*1\r\n$4\r\nPING".getBytes(StandardCharsets.UTF_8));
+            blocker2.getOutputStream().flush();
+
+            // give workers time to pick up the blocking sockets
+            Thread.sleep(150);
+
+            Socket rejected = new Socket("127.0.0.1", saturated.boundPort());
+            rejected.setSoTimeout(500);
+            int read = rejected.getInputStream().read();
+            assertEquals(-1, read, "rejected connection should be closed by server");
+
+            blocker1.close();
+            blocker2.close();
+            rejected.close();
+
+            // server recovers after blocked clients disconnect
+            Thread.sleep(100);
+            String resp = sendAndReadOnPort(saturated.boundPort(), "*1\r\n$4\r\nPING\r\n");
+            assertEquals("+PONG\r\n", resp);
+        } finally {
+            saturated.close();
+        }
+    }
+
+    private String sendAndReadOnPort(int port, String command) throws IOException {
+        try (Socket s = new Socket("127.0.0.1", port)) {
+            OutputStream out = s.getOutputStream();
+            out.write(command.getBytes(StandardCharsets.UTF_8));
+            out.flush();
+            s.shutdownOutput();
+            return readAll(s.getInputStream());
+        }
+    }
 }

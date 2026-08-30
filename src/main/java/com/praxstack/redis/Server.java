@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -34,9 +37,12 @@ public final class Server implements AutoCloseable {
     private static final Logger LOG = Logger.getLogger(Server.class.getName());
     private static final int DEFAULT_PORT = 6379;
     private static final int DEFAULT_WORKER_THREADS = 100;
+    /** Pending client handlers = 2× worker threads; excess connections are rejected. */
+    static final int DEFAULT_QUEUE_CAPACITY_MULTIPLIER = 2;
 
     private final int port;
     private final ExecutorService workers;
+    private final int queueCapacity;
     private final Store store;
     private final ExpiryManager expiryManager;
     private final CommandDispatcher dispatcher;
@@ -46,12 +52,24 @@ public final class Server implements AutoCloseable {
     private Thread acceptorThread;
 
     public Server(int port, int workerThreads) {
+        this(port, workerThreads, workerThreads * DEFAULT_QUEUE_CAPACITY_MULTIPLIER);
+    }
+
+    /** Package-visible for tests that need a small queue to exercise rejection. */
+    Server(int port, int workerThreads, int queueCapacity) {
         this.port = port;
-        this.workers = Executors.newFixedThreadPool(workerThreads, r -> {
-            Thread t = new Thread(r, "redis-worker");
-            t.setDaemon(true);
-            return t;
-        });
+        this.queueCapacity = queueCapacity;
+        BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(queueCapacity);
+        this.workers = new ThreadPoolExecutor(
+                workerThreads, workerThreads,
+                0L, TimeUnit.MILLISECONDS,
+                queue,
+                r -> {
+                    Thread t = new Thread(r, "redis-worker");
+                    t.setDaemon(true);
+                    return t;
+                },
+                new ThreadPoolExecutor.AbortPolicy());
         this.store = new Store();
         this.expiryManager = new ExpiryManager(store);
         this.dispatcher = new CommandDispatcher(store);
@@ -86,7 +104,18 @@ public final class Server implements AutoCloseable {
             try {
                 Socket client = serverSocket.accept();
                 client.setTcpNoDelay(true);
-                workers.submit(new ClientHandler(client, dispatcher));
+                try {
+                    workers.submit(new ClientHandler(client, dispatcher));
+                } catch (RejectedExecutionException ex) {
+                    LOG.log(Level.WARNING, () -> "worker pool saturated (queue="
+                            + queueCapacity + "), rejecting connection from "
+                            + client.getRemoteSocketAddress());
+                    try {
+                        client.close();
+                    } catch (IOException closeEx) {
+                        LOG.log(Level.FINE, "failed to close rejected socket", closeEx);
+                    }
+                }
             } catch (IOException ex) {
                 if (running.get()) {
                     LOG.log(Level.WARNING, "accept() failed", ex);

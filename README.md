@@ -4,6 +4,7 @@ RESP2-compatible Redis server implemented in **Java 17**, built as a deep-dive i
 
 [![Java 17](https://img.shields.io/badge/Java-17-orange)](https://openjdk.org/projects/jdk/17/)
 [![Build](https://img.shields.io/badge/build-Maven-blue)](https://maven.apache.org/)
+[![CI](https://github.com/praxstack/redis-server-java/actions/workflows/ci.yml/badge.svg)](https://github.com/praxstack/redis-server-java/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-JUnit5%20%2B%20Mockito-green)](#running-tests)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -71,10 +72,10 @@ Every design choice was made to force a conversation about a Java concurrency pr
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | **Thread-per-client on a bounded `ExecutorService`** (fixed pool of 100 daemons) | Predictable resource footprint under Slashdot load. Naive `new Thread()` per connection leaks FDs and OOMs the JVM. `Executors.newFixedThreadPool` caps concurrency and queues excess accepts. |
-| 2 | **Lock-free reads via `ConcurrentHashMap`** | Reads (the hot path) never block. Writers use `compute()` for atomic read-modify-write, which is how `INCR` stays correct under 16-threads-hammering-the-same-key contention (verified by `StoreTest#incrIsAtomicUnderContention`). |
+| 1 | **Thread-per-client on a bounded `ThreadPoolExecutor`** (fixed pool of 100 daemons, queue = 2× workers) | Predictable resource footprint under load. Naive `new Thread()` per connection leaks FDs and OOMs the JVM. A bounded `ArrayBlockingQueue` plus `AbortPolicy` caps queued handlers; excess connections are closed immediately instead of growing an unbounded queue. |
+| 2 | **Lock-free reads via `ConcurrentHashMap`** | Reads (the hot path) never block. Writers use `compute()` for atomic read-modify-write, which is how `INCR` stays correct under 16-threads-hammering-the-same-key contention (verified by `StoreTest#incrIsAtomicUnderContention` and `ServerIntegrationTest#concurrentIncrConverges`). |
 | 3 | **Hybrid TTL eviction: lazy check on `GET` + active sweep** | Pure-lazy leaks memory for write-once-never-read keys; pure-active wastes CPU and is always behind on read correctness. Combining both gives bounded memory *and* correct reads. `ExpiryManager` runs on a `ScheduledExecutorService` single-thread at 100ms intervals. |
-| 4 | **Streaming RESP2 parser over a per-connection `BufferedInputStream`** | Correctly handles pipelined commands — clients that fire 100 commands without waiting for individual acks are a common `redis-benchmark` pattern. Parser returns one command at a time; loop in `ClientHandler` dispatches each. |
+| 4 | **Streaming RESP2 parser with bulk-string size cap (512 KiB)** | Correctly handles pipelined commands — clients that fire 100 commands without waiting for individual acks are a common `redis-benchmark` pattern. Parser returns one command at a time; loop in `ClientHandler` dispatches each. Oversized bulk headers are rejected before allocation to resist DoS. |
 | 5 | **Graceful shutdown via `Runtime.addShutdownHook`** | On SIGTERM the hook closes the `ServerSocket` (unblocking `accept()`), shuts down the `ExecutorService`, and `awaitTermination` with a 5s deadline so in-flight requests drain. Falls back to `shutdownNow()` on timeout. |
 | 6 | **Integration tests speak RESP2 over real `java.net.Socket`** | Unit tests lie. The wire protocol tests bind on port 0 (ephemeral), connect with a real `Socket`, send byte-for-byte RESP2, and assert responses. This is the only way to catch parser off-by-ones and encoder framing bugs. |
 
@@ -150,13 +151,13 @@ $ sleep 1 && redis-cli -p 6379 GET ephemeral
 mvn clean test
 ```
 
-**42 tests across 5 suites**, all passing:
+**54 tests across 5 suites**, all passing:
 
-- `RespParserTest` — 7 tests (pipelining, UTF-8, malformed input)
+- `RespParserTest` — 9 tests (pipelining, UTF-8, malformed input, bulk size limits)
 - `RespEncoderTest` — 7 tests (bulk, integer, error, null bulk)
-- `StoreTest` — 10 tests (including a 16-thread × 500-ops contention test for `INCR`)
+- `StoreTest` — 10 tests (TTL, INCR atomicity including 16-thread × 500-ops contention)
 - `CommandDispatcherTest` — 13 tests (every command, error paths, case-insensitivity)
-- `ServerIntegrationTest` — 5 tests (real TCP sockets, 20-client concurrent GET/SET, PX expiry)
+- `ServerIntegrationTest` — 6 tests (real TCP sockets, concurrent clients, pool saturation rejection)
 
 ---
 
