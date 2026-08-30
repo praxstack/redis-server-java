@@ -25,13 +25,23 @@ import java.util.List;
  */
 public final class RespParser {
 
+    /** Maximum bulk-string payload size (512 KiB). Conservative default for DoS resistance. */
+    static final int DEFAULT_MAX_BULK_STRING_BYTES = 512 * 1024;
+
     private static final byte CR = '\r';
     private static final byte LF = '\n';
 
     private final InputStream in;
+    private final int maxBulkStringBytes;
 
     public RespParser(InputStream in) {
+        this(in, DEFAULT_MAX_BULK_STRING_BYTES);
+    }
+
+    /** Package-private for tests that need a smaller limit without allocating large buffers. */
+    RespParser(InputStream in, int maxBulkStringBytes) {
         this.in = in;
+        this.maxBulkStringBytes = maxBulkStringBytes;
     }
 
     /**
@@ -63,6 +73,9 @@ public final class RespParser {
         }
         int len = readInteger();
         if (len < 0) return null;
+        if (len > maxBulkStringBytes) {
+            throw new IOException("Bulk string length " + len + " exceeds maximum " + maxBulkStringBytes);
+        }
         byte[] buf = readNBytes(len);
         expectCrlf();
         return new String(buf, StandardCharsets.UTF_8);

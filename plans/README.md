@@ -8,11 +8,11 @@ Non-interactive run: top 5 findings by leverage were planned automatically.
 
 | # | Plan | Priority | Effort | Depends on | Status |
 |---|------|----------|--------|------------|--------|
-| 001 | [Fix README StoreTest documentation drift](001-fix-readme-storetest-drift.md) | P1 | S | none | TODO |
-| 002 | [Add Store unit tests including INCR contention](002-add-store-unit-tests.md) | P1 | M | none | TODO |
-| 003 | [Add RESP parser bulk-string size limit](003-resp-parser-size-limit.md) | P1 | S | none | TODO |
-| 004 | [Add GitHub Actions CI for mvn test](004-add-github-actions-ci.md) | P2 | S | none | TODO |
-| 005 | [Bound accept queue / backpressure policy](005-accept-backpressure.md) | P2 | M | 002 | TODO |
+| 001 | [Fix README StoreTest documentation drift](001-fix-readme-storetest-drift.md) | P1 | S | none | DONE |
+| 002 | [Add Store unit tests including INCR contention](002-add-store-unit-tests.md) | P1 | M | none | DONE |
+| 003 | [Add RESP parser bulk-string size limit](003-resp-parser-size-limit.md) | P1 | S | none | DONE |
+| 004 | [Add GitHub Actions CI for mvn test](004-add-github-actions-ci.md) | P2 | S | none | DONE |
+| 005 | [Bound accept queue / backpressure policy](005-accept-backpressure.md) | P2 | M | 002 | DONE |
 
 ## Dependency graph
 
