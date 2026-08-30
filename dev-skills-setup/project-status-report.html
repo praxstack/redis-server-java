@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Status and Environment Report — redis-server-java</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+      --info: #79c0ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    h2 {
+      font-size: 1.25rem;
+      margin: 2rem 0 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+    h3 { font-size: 1rem; margin: 1rem 0 0.5rem; color: var(--info); }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .meta strong { color: var(--text); }
+    p { margin-bottom: 0.75rem; }
+    ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+    li { margin-bottom: 0.35rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1.25rem;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--surface); color: var(--accent); font-weight: 600; }
+    tr:nth-child(even) td { background: rgba(26, 33, 42, 0.5); }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-merged { background: rgba(63, 185, 80, 0.2); color: var(--success); }
+    .badge-todo { background: rgba(210, 153, 34, 0.2); color: var(--warning); }
+    .badge-blocked { background: rgba(248, 81, 73, 0.2); color: var(--danger); }
+    .badge-info { background: rgba(88, 166, 255, 0.15); color: var(--info); }
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--warning);
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+    .callout-danger { border-left-color: var(--danger); }
+    .callout-info { border-left-color: var(--info); }
+    code {
+      background: rgba(110, 118, 129, 0.2);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.85em;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 6px;
+    }
+    .stat-card .value { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .stat-card .label { font-size: 0.8rem; color: var(--muted); }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Project Status and Environment Report</h1>
+  <p class="meta">
+  <strong>Repository:</strong> <a href="https://github.com/praxstack/redis-server-java" style="color:var(--accent)">github.com/praxstack/redis-server-java</a><br>
+  <strong>Prepared for:</strong> Prax Lannister (praxstack)<br>
+  <strong>Generated:</strong> 2026-08-30 UTC<br>
+  <strong>Branch inspected:</strong> <code>main</code> (HEAD <code>62b8fd0</code>)<br>
+  <strong>Cloud agent run:</strong> <a href="https://cursor.com/agents/bc-b5a76a15-8508-50fd-b1be-4536c2639282" style="color:var(--accent)">bc-b5a76a15</a>
+  </p>
+
+  <h2>Executive Summary</h2>
+  <p>
+    The <strong>redis-server-java</strong> repository has successfully integrated the PraxStack 2026 skills architecture onto <code>main</code>.
+    All three pull requests (#1 cloud-agent env, #2 super-pro skills stack, #3 gstack flat-alias fix) are <strong>merged</strong>.
+    The personal skills layer (commit <code>62b8fd0</code>) and PraxStack 2026 setup (commit <code>97ffe57</code>) are on <code>main</code>.
+    This VM hosts <strong>1,205</strong> agent skills and <strong>144</strong> Cursor skills, including flat gstack slash commands (<code>/qa</code>, <code>/ship</code>, etc.).
+  </p>
+  <p>
+    <strong>Outstanding work:</strong> All five <code>plans/001–005</code> improvement items remain <span class="badge badge-todo">TODO</span>.
+    CodeRabbit CLI is <strong>not authenticated</strong> on this VM.
+    VM-installed skills <strong>do not sync</strong> to the local desktop automatically.
+    The <code>deb</code> branch <strong>does not exist</strong> locally or on <code>origin</code> — it was never created in this repository.
+    Some merges were completed via direct fast-forward pushes when the GitHub token lacked full PR-creation permissions.
+  </p>
+
+  <h2>Completed</h2>
+  <ul>
+    <li><strong>PR #1 merged</strong> — Cloud Agent development environment (<code>.cursor/Dockerfile</code>, <code>environment.json</code>, install script). Merged 2026-08-29.</li>
+    <li><strong>PR #2 merged</strong> — Super-pro skills stack installer and layered workflow docs (<code>install-pro-skills.sh</code>, <code>PRAXSTACK.md</code>). Merged 2026-08-29.</li>
+    <li><strong>PR #3 merged</strong> — gstack Cursor skill discovery fix with flat slash-command names via <code>link_gstack_flat_cursor_skills()</code>. Merged 2026-08-29.</li>
+    <li><strong>Commit <code>97ffe57</code></strong> — PraxStack 2026 setup: expanded <code>PRAXSTACK.md</code>, OpenSpec commands/skills, graphify rule, installer enhancements.</li>
+    <li><strong>Commit <code>62b8fd0</code></strong> — Personal layer integration: <code>install-prax-personal-layer.sh</code>, skills-and-personas wiring in main installer.</li>
+    <li><strong>Skills stack on VM</strong> — 1,205 skills in <code>~/.agents/skills</code> (141 MB); 144 in <code>~/.cursor/skills</code>.</li>
+    <li><strong>gstack flat aliases verified</strong> — <code>learn</code>, <code>office-hours</code>, <code>plan-ceo-review</code>, <code>qa</code>, <code>review</code>, <code>ship</code> present in <code>~/.cursor/skills/</code>.</li>
+    <li><strong>OpenSpec installed</strong> — <code>openspec/config.yaml</code> and <code>.cursor/commands/opsx-*</code> on <code>main</code>.</li>
+    <li><strong>Improve audit plans created</strong> — <code>plans/001–005</code> committed at <code>ee1af19</code> (2026-08-29).</li>
+    <li><strong>Build verification</strong> — <code>mvn test</code> passes on this VM (2026-08-30).</li>
+  </ul>
+
+  <h2>Pending</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Plan 001 — Fix README StoreTest drift</td>
+        <td>P1</td>
+        <td><span class="badge badge-todo">TODO</span></td>
+        <td>README claims StoreTest that does not exist</td>
+      </tr>
+      <tr>
+        <td>Plan 002 — Add Store unit tests</td>
+        <td>P1</td>
+        <td><span class="badge badge-todo">TODO</span></td>
+        <td>Includes INCR contention test</td>
+      </tr>
+      <tr>
+        <td>Plan 003 — RESP parser size limit</td>
+        <td>P1</td>
+        <td><span class="badge badge-todo">TODO</span></td>
+        <td>Security hardening</td>
+      </tr>
+      <tr>
+        <td>Plan 004 — GitHub Actions CI</td>
+        <td>P2</td>
+        <td><span class="badge badge-todo">TODO</span></td>
+        <td><code>mvn test</code> in CI</td>
+      </tr>
+      <tr>
+        <td>Plan 005 — Accept backpressure</td>
+        <td>P2</td>
+        <td><span class="badge badge-todo">TODO</span></td>
+        <td>Depends on Plan 002</td>
+      </tr>
+      <tr>
+        <td>Branch <code>prax/improve-plans-d404</code></td>
+        <td>—</td>
+        <td><span class="badge badge-info">STALE</span></td>
+        <td>Behind <code>main</code>; missing commits 97ffe57 and 62b8fd0</td>
+      </tr>
+      <tr>
+        <td>Local desktop skills sync</td>
+        <td>—</td>
+        <td><span class="badge badge-blocked">NOT AUTO</span></td>
+        <td>VM <code>~/.agents/skills</code> and <code>~/.cursor/skills</code> are VM-local; user must run installer locally</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>User-Gated Actions</h2>
+  <div class="callout callout-danger">
+    <strong>These require action from Prax — agents cannot complete them autonomously.</strong>
+  </div>
+  <ul>
+    <li><strong>CodeRabbit authentication</strong> — CLI reports <code>Status: signed out</code>. Run <code>coderabbit auth login</code> on the machine where reviews are needed. Binary at <code>/home/ubuntu/.local/bin/coderabbit</code>.</li>
+    <li><strong>GitHub token permissions</strong> — The cloud-agent <code>gh</code> token can list PRs but returns HTTP 403 on <code>gh api user</code> (<em>Resource not accessible by integration</em>). PR creation may fail; some work was merged via direct fast-forward push instead of PR workflow.</li>
+    <li><strong>Local skills replication</strong> — Run <code>dev-skills-setup/install-pro-skills.sh</code> (and optionally <code>install-prax-personal-layer.sh</code>) on the local desktop to mirror VM skills. No automatic sync exists.</li>
+    <li><strong>Branch <code>deb</code></strong> — If <code>deb</code> was intended for a feature branch, it was never pushed to this repository. User must create and push it, or clarify the intended branch name.</li>
+  </ul>
+
+  <h2>Sub-Agent and Multitask Behavior</h2>
+  <div class="callout callout-info">
+    <p><strong>Why you may see "no response" until a notification:</strong></p>
+    <p>
+      In multitask mode, the parent agent dispatches sub-agents (e.g., for parallel evidence gathering or HTML generation) and <strong>ends its turn immediately</strong>.
+      Sub-agents complete asynchronously. The parent does not block waiting for all children.
+      A notification arrives when the sub-agent finishes or when the coordinator aggregates results.
+      This is expected behavior, not a hang or failure.
+    </p>
+  </div>
+
+  <h2>Git Branch Status — <code>deb</code> vs <code>main</code></h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Branch</th>
+        <th>Exists?</th>
+        <th>HEAD</th>
+        <th>Relation to main</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>main</code></td>
+        <td>Yes (local + origin)</td>
+        <td><code>62b8fd0</code></td>
+        <td>Current production branch; clean working tree</td>
+      </tr>
+      <tr>
+        <td><code>deb</code></td>
+        <td><strong>No</strong></td>
+        <td>—</td>
+        <td>Not found locally, on <code>origin</code>, or in <code>git fetch --all</code> results. No commits reference "deb" in message search.</td>
+      </tr>
+      <tr>
+        <td><code>prax/cloud-agent-env-setup-d404</code></td>
+        <td>origin only</td>
+        <td>merged via PR #1</td>
+        <td>Merged to main</td>
+      </tr>
+      <tr>
+        <td><code>prax/super-pro-skills-stack-d404</code></td>
+        <td>origin only</td>
+        <td>merged via PR #2</td>
+        <td>Merged to main</td>
+      </tr>
+      <tr>
+        <td><code>prax/fix-gstack-cursor-skills-a79b</code></td>
+        <td>origin only</td>
+        <td>merged via PR #3</td>
+        <td>Merged to main</td>
+      </tr>
+      <tr>
+        <td><code>prax/praxstack-2026-setup-d404</code></td>
+        <td>local + origin</td>
+        <td><code>97ffe57</code></td>
+        <td>Content on main (fast-forward or direct merge)</td>
+      </tr>
+      <tr>
+        <td><code>prax/integrate-skills-personas-d404</code></td>
+        <td>local + origin</td>
+        <td><code>62b8fd0</code></td>
+        <td>Content on main</td>
+      </tr>
+      <tr>
+        <td><code>prax/improve-plans-d404</code></td>
+        <td>local + origin</td>
+        <td><code>ee1af19</code></td>
+        <td><strong>Behind main</strong> — lacks 97ffe57, 62b8fd0, PR #3 merge</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    <strong>Conclusion on <code>deb</code>:</strong> There is no <code>deb</code> branch in <code>praxstack/redis-server-java</code>.
+    If work was expected on <code>deb</code>, it either lives in a different repository, was never pushed, or uses a different branch name (e.g. <code>prax/*-d404</code> pattern).
+  </p>
+
+  <h2>Pull Request Status</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Branch</th>
+        <th>State</th>
+        <th>Merged</th>
+        <th>Additions</th>
+        <th>Deletions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://github.com/praxstack/redis-server-java/pull/1" style="color:var(--accent)">#1</a></td>
+        <td>Add Cloud Agent development environment</td>
+        <td><code>prax/cloud-agent-env-setup-d404</code></td>
+        <td><span class="badge badge-merged">MERGED</span></td>
+        <td>2026-08-29</td>
+        <td>30</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td><a href="https://github.com/praxstack/redis-server-java/pull/2" style="color:var(--accent)">#2</a></td>
+        <td>Add super-pro skills stack installer and workflow docs</td>
+        <td><code>prax/super-pro-skills-stack-d404</code></td>
+        <td><span class="badge badge-merged">MERGED</span></td>
+        <td>2026-08-29</td>
+        <td>399</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td><a href="https://github.com/praxstack/redis-server-java/pull/3" style="color:var(--accent)">#3</a></td>
+        <td>Fix gstack Cursor skill discovery with flat slash-command names</td>
+        <td><code>prax/fix-gstack-cursor-skills-a79b</code></td>
+        <td><span class="badge badge-merged">MERGED</span></td>
+        <td>2026-08-29</td>
+        <td>38</td>
+        <td>3</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>No open pull requests. Total PR count: 3 (all merged).</p>
+
+  <h2>Environment Freshness</h2>
+  <div class="grid-2">
+    <div class="stat-card">
+      <div class="value">1,205</div>
+      <div class="label">Agent skills (~/.agents/skills)</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">144</div>
+      <div class="label">Cursor skills (~/.cursor/skills)</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">141 MB</div>
+      <div class="label">Skills disk usage</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">OpenJDK 21</div>
+      <div class="label">Runtime (Dockerfile specifies JDK 17)</div>
+    </div>
+  </div>
+
+  <h3>Tool Versions (VM)</h3>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Version / Path</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Java</td><td>OpenJDK 21.0.10</td><td>VM host JDK; Dockerfile uses Temurin 17</td></tr>
+      <tr><td>Maven</td><td>3.8.7</td><td>—</td></tr>
+      <tr><td>redis-cli</td><td>7.0.15</td><td>—</td></tr>
+      <tr><td>CodeRabbit</td><td>signed out</td><td><span class="badge badge-blocked">NOT AUTH</span></td></tr>
+      <tr><td>GitHub CLI</td><td>logged in (cursor integration)</td><td>Limited token scope</td></tr>
+      <tr><td>Cloud environment</td><td>Override build (5e1e8f64)</td><td>Personal/override env; environment.json not exposed via API</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Key Files on main</h3>
+  <table>
+    <thead>
+      <tr><th>File</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>dev-skills-setup/PRAXSTACK.md</code></td><td>Present — 10-layer pipeline docs</td></tr>
+      <tr><td><code>dev-skills-setup/install-pro-skills.sh</code></td><td>Present — includes gstack flat linker</td></tr>
+      <tr><td><code>dev-skills-setup/install-prax-personal-layer.sh</code></td><td>Present — personal layer installer</td></tr>
+      <tr><td><code>.cursor/environment.json</code></td><td>Present — Redis Server Java cloud agent config</td></tr>
+      <tr><td><code>openspec/config.yaml</code></td><td>Present — spec-driven schema</td></tr>
+      <tr><td><code>plans/README.md</code></td><td>Present — 5 plans, all TODO</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Honest Delays and Blockers Explanation</h2>
+  <div class="callout">
+    <h3>What caused delays and incomplete items</h3>
+    <ol>
+      <li><strong>GitHub token scope</strong> — The cloud-agent integration token cannot access full user API endpoints and may lack PR-create permissions. When PR creation failed, agents used direct fast-forward pushes to <code>main</code> instead. This bypasses PR review workflow but landed the code.</li>
+      <li><strong>CodeRabbit not authenticated</strong> — Automated code review via CodeRabbit CLI requires user login. Agents documented this blocker; no substitute review pipeline runs without it.</li>
+      <li><strong>VM vs local divergence</strong> — Skills installed on the cloud VM do not propagate to Prax's local desktop. Each environment needs its own installer run. This is architectural, not a sync bug.</li>
+      <li><strong>Plans not executed yet</strong> — The <code>/improve</code> audit generated plans 001–005 but implementation was deferred. All remain TODO; no agent turn was allocated to execute them after plan creation.</li>
+      <li><strong>Sub-agent async completion</strong> — Multitask mode ends parent turns before sub-agents finish, which can make the UI appear idle until notifications arrive. This is by design, not a failure.</li>
+      <li><strong>Missing <code>deb</code> branch</strong> — Investigation found no <code>deb</code> branch anywhere in this repo. If work was expected there, it was never created or exists elsewhere.</li>
+      <li><strong>Stale feature branches</strong> — <code>prax/improve-plans-d404</code> was not rebased after subsequent main commits; it is behind and not actionable without update.</li>
+    </ol>
+  </div>
+
+  <h2>Recent main Commits</h2>
+  <table>
+    <thead>
+      <tr><th>Commit</th><th>Message</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>62b8fd0</code></td><td>feat: integrate praxstack/skills-and-personas personal layer</td></tr>
+      <tr><td><code>97ffe57</code></td><td>Add PraxStack 2026 setup: architecture docs, expanded installer, OpenSpec and graphify</td></tr>
+      <tr><td><code>6598a3f</code></td><td>Merge pull request #3 from praxstack/prax/fix-gstack-cursor-skills-a79b</td></tr>
+      <tr><td><code>f1131c4</code></td><td>Fix gstack Cursor skill discovery with flat slash-command names</td></tr>
+      <tr><td><code>ee1af19</code></td><td>Add improve audit plans for redis-server-java</td></tr>
+      <tr><td><code>cfe2170</code></td><td>Merge pull request #1 from praxstack/prax/cloud-agent-env-setup-d404</td></tr>
+      <tr><td><code>944f5b2</code></td><td>Merge pull request #2 from praxstack/prax/super-pro-skills-stack-d404</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    Report generated by Cursor Cloud Agent. Evidence gathered via <code>git</code>, <code>gh</code>, filesystem inspection, <code>mvn test</code>, <code>coderabbit auth status</code>, and cursor-cloud MCP.
+    Saved to <code>dev-skills-setup/project-status-report.html</code> and <code>/opt/cursor/artifacts/project-status-report.html</code>.
+  </footer>
+
+</body>
+</html>
