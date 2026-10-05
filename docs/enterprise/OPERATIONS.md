@@ -28,7 +28,7 @@ Entry point: `Server.main()` (`src/main/java/com/praxstack/redis/Server.java:139
 ## Test
 
 ```bash
-mvn test          # full suite (45 tests)
+mvn test          # full suite (69 tests)
 mvn test -q       # quiet
 mvn -B test       # batch mode (CI)
 mvn test -Dtest=StoreTest   # single class
