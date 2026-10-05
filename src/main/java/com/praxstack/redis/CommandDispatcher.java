@@ -48,6 +48,7 @@ public final class CommandDispatcher {
         handlers.put("FLUSHDB", this::handleFlush);
         handlers.put("FLUSHALL", this::handleFlush);
         handlers.put("TYPE", this::handleType);
+        handlers.put("KEYS", this::handleKeys);
         handlers.put("MGET", this::handleMget);
         handlers.put("MSET", this::handleMset);
         handlers.put("EXPIRE", this::handleExpire);
@@ -241,5 +242,10 @@ public final class CommandDispatcher {
     private byte[] handleType(List<String> args) {
         if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'type'");
         return RespEncoder.simpleString(store.type(args.get(1)));
+    }
+
+    private byte[] handleKeys(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'keys'");
+        return RespEncoder.bulkArray(store.keys(args.get(1)));
     }
 }

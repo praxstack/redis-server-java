@@ -105,6 +105,7 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `DBSIZE` | `DBSIZE` | integer (live keys) |
 | `FLUSHDB` / `FLUSHALL` | `FLUSHDB` | `+OK` |
 | `TYPE key` | `TYPE k` | `string` or `none` |
+| `KEYS pattern` | `KEYS user:*` | array of matching keys |
 | `COMMAND` / `CONFIG GET` | | empty array (stub) |
 
 ---

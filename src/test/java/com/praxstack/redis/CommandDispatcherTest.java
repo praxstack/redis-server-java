@@ -226,4 +226,24 @@ class CommandDispatcherTest {
         Thread.sleep(80L);
         assertEquals("+none\r\n", dispatch(d, "TYPE", "k"));
     }
+
+    @Test
+    void keysMatchesGlobAndSkipsExpired() throws InterruptedException {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "MSET", "user:1", "a", "user:2", "b", "other", "c");
+        dispatch(d, "SET", "user:x", "gone", "PX", "30");
+        String star = dispatch(d, "KEYS", "*");
+        assertTrue(star.startsWith("*"), star);
+        assertTrue(star.contains("$6\r\nuser:1\r\n"), star);
+        assertTrue(star.contains("$6\r\nuser:2\r\n"), star);
+        assertTrue(star.contains("$5\r\nother\r\n"), star);
+        String prefix = dispatch(d, "KEYS", "user:*");
+        assertTrue(prefix.contains("user:1"), prefix);
+        assertTrue(prefix.contains("user:2"), prefix);
+        assertFalse(prefix.contains("other"), prefix);
+        Thread.sleep(80L);
+        String after = dispatch(d, "KEYS", "user:*");
+        assertFalse(after.contains("user:x"), after);
+        assertEquals("*0\r\n", dispatch(d, "KEYS", "nope*"));
+    }
 }

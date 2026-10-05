@@ -2,9 +2,12 @@ package com.praxstack.redis;
 
 import java.time.Instant;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * Thread-safe key/value store backed by {@link ConcurrentHashMap}.
@@ -209,6 +212,38 @@ public final class Store {
     /** Redis TYPE: {@code string} if present, {@code none} if missing/expired. */
     public String type(String key) {
         return exists(key) ? "string" : "none";
+    }
+
+    /** Glob match (`*` / `?`) over live keys. */
+    public List<String> keys(String pattern) {
+        Pattern compiled = Pattern.compile(globToRegex(pattern == null ? "" : pattern));
+        List<String> out = new ArrayList<>();
+        long now = Instant.now().toEpochMilli();
+        for (Map.Entry<String, StoredValue> e : map.entrySet()) {
+            if (e.getValue().isExpired(now)) continue;
+            if (compiled.matcher(e.getKey()).matches()) {
+                out.add(e.getKey());
+            }
+        }
+        return out;
+    }
+
+    static String globToRegex(String pattern) {
+        StringBuilder re = new StringBuilder();
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            switch (c) {
+                case '*' -> re.append(".*");
+                case '?' -> re.append('.');
+                default -> {
+                    if ("\\.[]{}()+-^$|".indexOf(c) >= 0) {
+                        re.append('\\');
+                    }
+                    re.append(c);
+                }
+            }
+        }
+        return re.toString();
     }
 
     /** Used by {@link ExpiryManager} to purge keys that have crossed their TTL. */
