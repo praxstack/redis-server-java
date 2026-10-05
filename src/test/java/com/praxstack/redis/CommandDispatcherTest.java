@@ -191,4 +191,13 @@ class CommandDispatcherTest {
         Thread.sleep(80L);
         assertEquals(":-2\r\n", dispatch(d, "TTL", "k"));
     }
+
+    @Test
+    void getDelReturnsValueAndRemovesKey() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "k", "v");
+        assertEquals("$1\r\nv\r\n", dispatch(d, "GETDEL", "k"));
+        assertEquals("$-1\r\n", dispatch(d, "GET", "k"));
+        assertEquals("$-1\r\n", dispatch(d, "GETDEL", "k"));
+    }
 }

@@ -89,6 +89,7 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `ECHO <msg>` | `ECHO hey` | bulk string |
 | `SET key value [NX\|XX] [PX ms \| EX s]` | `SET x 1 NX PX 500` | `+OK` or nil |
 | `GET key` | `GET x` | bulk string or nil |
+| `GETDEL key` | `GETDEL x` | bulk, then deletes |
 | `DEL key [key ...]` | `DEL a b c` | integer (# removed) |
 | `INCR key` | `INCR counter` | integer (new value) |
 | `DECR key` | `DECR counter` | integer (new value) |

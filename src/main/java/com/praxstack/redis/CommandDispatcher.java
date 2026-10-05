@@ -40,6 +40,7 @@ public final class CommandDispatcher {
         handlers.put("DECRBY", this::handleDecrBy);
         handlers.put("APPEND", this::handleAppend);
         handlers.put("STRLEN", this::handleStrlen);
+        handlers.put("GETDEL", this::handleGetDel);
         handlers.put("EXISTS", this::handleExists);
         handlers.put("COMMAND", args -> RespEncoder.emptyArray());
         handlers.put("CONFIG", args -> RespEncoder.emptyArray());
@@ -222,5 +223,10 @@ public final class CommandDispatcher {
     private byte[] handlePersist(List<String> args) {
         if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'persist'");
         return RespEncoder.integer(store.persist(args.get(1)) ? 1 : 0);
+    }
+
+    private byte[] handleGetDel(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'getdel'");
+        return store.getDel(args.get(1)).map(RespEncoder::bulkString).orElse(RespEncoder.nullBulk());
     }
 }

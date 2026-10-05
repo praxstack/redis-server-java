@@ -172,6 +172,13 @@ public final class Store {
         return get(key).map(s -> s.getBytes(StandardCharsets.UTF_8).length).orElse(0);
     }
 
+    /** Atomic GET + DEL. Empty if missing or expired. */
+    public Optional<String> getDel(String key) {
+        StoredValue v = map.remove(key);
+        if (v == null || v.isExpired()) return Optional.empty();
+        return Optional.of(v.value());
+    }
+
     public boolean exists(String key) {
         return get(key).isPresent();
     }
