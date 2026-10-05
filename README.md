@@ -87,7 +87,7 @@ Every design choice was made to force a conversation about a Java concurrency pr
 |---------|---------|---------|
 | `PING [msg]` | `PING hello` | `+PONG` or bulk of `msg` |
 | `ECHO <msg>` | `ECHO hey` | bulk string |
-| `SET key value [PX ms \| EX s]` | `SET x 1 PX 500` | `+OK` |
+| `SET key value [NX\|XX] [PX ms \| EX s]` | `SET x 1 NX PX 500` | `+OK` or nil |
 | `GET key` | `GET x` | bulk string or nil |
 | `DEL key [key ...]` | `DEL a b c` | integer (# removed) |
 | `INCR key` | `INCR counter` | integer (new value) |

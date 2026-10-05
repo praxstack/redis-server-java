@@ -74,22 +74,42 @@ public final class CommandDispatcher {
     }
 
     /**
-     * SET key value [PX milliseconds]
+     * SET key value [NX|XX] [EX seconds|PX milliseconds] — options in any order.
      */
     private byte[] handleSet(List<String> args) {
         if (args.size() < 3) return RespEncoder.error("ERR wrong number of arguments for 'set'");
         String key = args.get(1);
         String value = args.get(2);
-        if (args.size() >= 5 && "PX".equalsIgnoreCase(args.get(3))) {
-            long ttl = Long.parseLong(args.get(4));
-            store.setWithTtlMillis(key, value, ttl);
-        } else if (args.size() >= 5 && "EX".equalsIgnoreCase(args.get(3))) {
-            long ttl = Long.parseLong(args.get(4)) * 1000L;
-            store.setWithTtlMillis(key, value, ttl);
-        } else {
-            store.set(key, value);
+        boolean nx = false;
+        boolean xx = false;
+        Long ttlMillis = null;
+        for (int i = 3; i < args.size(); i++) {
+            String opt = args.get(i).toUpperCase(Locale.ROOT);
+            switch (opt) {
+                case "NX" -> nx = true;
+                case "XX" -> xx = true;
+                case "EX" -> {
+                    if (i + 1 >= args.size()) {
+                        return RespEncoder.error("ERR syntax error");
+                    }
+                    ttlMillis = Long.parseLong(args.get(++i)) * 1000L;
+                }
+                case "PX" -> {
+                    if (i + 1 >= args.size()) {
+                        return RespEncoder.error("ERR syntax error");
+                    }
+                    ttlMillis = Long.parseLong(args.get(++i));
+                }
+                default -> {
+                    return RespEncoder.error("ERR syntax error");
+                }
+            }
         }
-        return RespEncoder.ok();
+        if (nx && xx) {
+            return RespEncoder.error("ERR syntax error");
+        }
+        boolean applied = store.setConditional(key, value, ttlMillis, nx, xx);
+        return applied ? RespEncoder.ok() : RespEncoder.nullBulk();
     }
 
     private byte[] handleGet(List<String> args) {

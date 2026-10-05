@@ -82,6 +82,39 @@ class CommandDispatcherTest {
     }
 
     @Test
+    void setNxSucceedsOnlyWhenMissing() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+OK\r\n", dispatch(d, "SET", "k", "a", "NX"));
+        assertEquals("$-1\r\n", dispatch(d, "SET", "k", "b", "NX"));
+        assertEquals("$1\r\na\r\n", dispatch(d, "GET", "k"));
+    }
+
+    @Test
+    void setXxSucceedsOnlyWhenPresent() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("$-1\r\n", dispatch(d, "SET", "k", "a", "XX"));
+        dispatch(d, "SET", "k", "a");
+        assertEquals("+OK\r\n", dispatch(d, "SET", "k", "b", "XX", "PX", "5000"));
+        assertEquals("$1\r\nb\r\n", dispatch(d, "GET", "k"));
+    }
+
+    @Test
+    void setNxAndXxTogetherIsSyntaxError() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        String out = dispatch(d, "SET", "k", "v", "NX", "XX");
+        assertTrue(out.startsWith("-ERR syntax error"), out);
+    }
+
+    @Test
+    void setNxOnExpiredKeySucceeds() throws InterruptedException {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "k", "old", "PX", "30");
+        Thread.sleep(80L);
+        assertEquals("+OK\r\n", dispatch(d, "SET", "k", "new", "NX"));
+        assertEquals("$3\r\nnew\r\n", dispatch(d, "GET", "k"));
+    }
+
+    @Test
     void commandIntrospectionReturnsEmptyArray() {
         CommandDispatcher d = new CommandDispatcher(new Store());
         assertEquals("*0\r\n", dispatch(d, "COMMAND"));

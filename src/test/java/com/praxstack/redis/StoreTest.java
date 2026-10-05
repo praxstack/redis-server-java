@@ -26,6 +26,23 @@ class StoreTest {
     }
 
     @Test
+    void setConditionalNxRejectsExisting() {
+        Store store = new Store();
+        assertTrue(store.setConditional("k", "a", null, true, false));
+        assertFalse(store.setConditional("k", "b", null, true, false));
+        assertEquals(Optional.of("a"), store.get("k"));
+    }
+
+    @Test
+    void setConditionalXxRejectsMissing() {
+        Store store = new Store();
+        assertFalse(store.setConditional("k", "a", null, false, true));
+        store.set("k", "a");
+        assertTrue(store.setConditional("k", "b", 5_000L, false, true));
+        assertEquals(Optional.of("b"), store.get("k"));
+    }
+
+    @Test
     void lazyExpiryRemovesKeyOnGet() throws InterruptedException {
         Store store = new Store();
         store.setWithTtlMillis("k", "v", 50);

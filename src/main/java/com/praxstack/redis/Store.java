@@ -44,6 +44,37 @@ public final class Store {
     }
 
     /**
+     * Conditional SET used by {@code SET} NX/XX. Returns {@code true} if the
+     * write was applied.
+     *
+     * @param ttlMillis {@code null} means no expiry (or replace without TTL)
+     * @param nx        only set if the key is missing or expired
+     * @param xx        only set if the key currently exists
+     */
+    public boolean setConditional(String key, String value, Long ttlMillis, boolean nx, boolean xx) {
+        StoredValue neu = ttlMillis == null
+                ? StoredValue.of(value)
+                : StoredValue.withTtlMillis(value, ttlMillis);
+        if (!nx && !xx) {
+            map.put(key, neu);
+            return true;
+        }
+        boolean[] applied = {false};
+        map.compute(key, (k, existing) -> {
+            boolean present = existing != null && !existing.isExpired();
+            if (nx && present) {
+                return existing;
+            }
+            if (xx && !present) {
+                return existing;
+            }
+            applied[0] = true;
+            return neu;
+        });
+        return applied[0];
+    }
+
+    /**
      * Atomically increment the integer value of a key.
      *
      * @return the new value
