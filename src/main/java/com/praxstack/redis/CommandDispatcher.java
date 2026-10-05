@@ -1,5 +1,6 @@
 package com.praxstack.redis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +39,8 @@ public final class CommandDispatcher {
         handlers.put("COMMAND", args -> RespEncoder.emptyArray());
         handlers.put("CONFIG", args -> RespEncoder.emptyArray());
         handlers.put("DBSIZE", args -> RespEncoder.integer(store.size()));
+        handlers.put("MGET", this::handleMget);
+        handlers.put("MSET", this::handleMset);
     }
 
     public byte[] dispatch(List<String> args) {
@@ -117,5 +120,24 @@ public final class CommandDispatcher {
             if (store.exists(args.get(i))) count++;
         }
         return RespEncoder.integer(count);
+    }
+
+    private byte[] handleMget(List<String> args) {
+        if (args.size() < 2) return RespEncoder.error("ERR wrong number of arguments for 'mget'");
+        ArrayList<String> values = new ArrayList<>(args.size() - 1);
+        for (int i = 1; i < args.size(); i++) {
+            values.add(store.get(args.get(i)).orElse(null));
+        }
+        return RespEncoder.bulkArray(values);
+    }
+
+    private byte[] handleMset(List<String> args) {
+        if (args.size() < 3 || ((args.size() - 1) % 2) != 0) {
+            return RespEncoder.error("ERR wrong number of arguments for 'mset'");
+        }
+        for (int i = 1; i < args.size(); i += 2) {
+            store.set(args.get(i), args.get(i + 1));
+        }
+        return RespEncoder.ok();
     }
 }

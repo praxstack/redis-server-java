@@ -101,4 +101,25 @@ class CommandDispatcherTest {
         dispatch(d, "SET", "k", "notanumber");
         assertEquals("-ERR value is not an integer or out of range\r\n", dispatch(d, "INCR", "k"));
     }
+
+    @Test
+    void msetThenMgetReturnsValuesAndNils() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+OK\r\n", dispatch(d, "MSET", "a", "1", "b", "2"));
+        assertEquals("*3\r\n$1\r\n1\r\n$1\r\n2\r\n$-1\r\n", dispatch(d, "MGET", "a", "b", "missing"));
+    }
+
+    @Test
+    void msetRejectsOddArity() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        String out = dispatch(d, "MSET", "a", "1", "b");
+        assertTrue(out.startsWith("-ERR wrong number of arguments"), out);
+    }
+
+    @Test
+    void mgetRequiresAtLeastOneKey() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        String out = dispatch(d, "MGET");
+        assertTrue(out.startsWith("-ERR wrong number of arguments"), out);
+    }
 }

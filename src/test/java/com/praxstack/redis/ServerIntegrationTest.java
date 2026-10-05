@@ -74,6 +74,14 @@ class ServerIntegrationTest {
     }
 
     @Test
+    void msetAndMgetOverSocket() throws IOException {
+        String resp = sendAndRead(
+                "*5\r\n$4\r\nMSET\r\n$1\r\na\r\n$1\r\n1\r\n$1\r\nb\r\n$1\r\n2\r\n" +
+                "*3\r\n$4\r\nMGET\r\n$1\r\na\r\n$1\r\nb\r\n");
+        assertEquals("+OK\r\n*2\r\n$1\r\n1\r\n$1\r\n2\r\n", resp);
+    }
+
+    @Test
     void pxExpiryRemovesKey() throws IOException, InterruptedException {
         // SET k v PX 50
         try (Socket s = new Socket("127.0.0.1", server.boundPort())) {

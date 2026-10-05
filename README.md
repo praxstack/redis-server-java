@@ -92,6 +92,8 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `DEL key [key ...]` | `DEL a b c` | integer (# removed) |
 | `INCR key` | `INCR counter` | integer (new value) |
 | `EXISTS key [key ...]` | `EXISTS a b` | integer (# present) |
+| `MGET key [key ...]` | `MGET a b` | array of bulks / nils |
+| `MSET key value [key value ...]` | `MSET a 1 b 2` | `+OK` |
 | `DBSIZE` | `DBSIZE` | integer |
 | `COMMAND` / `CONFIG GET` | | empty array (stub) |
 

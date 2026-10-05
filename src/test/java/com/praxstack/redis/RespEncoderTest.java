@@ -3,6 +3,7 @@ package com.praxstack.redis;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,5 +48,12 @@ class RespEncoderTest {
     @Test
     void encodesEmptyArrayForCommandIntrospection() {
         assertEquals("*0\r\n", new String(RespEncoder.emptyArray(), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void encodesBulkArrayWithNilEntries() {
+        String encoded = new String(RespEncoder.bulkArray(Arrays.asList("a", null, "bc")),
+                StandardCharsets.UTF_8);
+        assertEquals("*3\r\n$1\r\na\r\n$-1\r\n$2\r\nbc\r\n", encoded);
     }
 }
