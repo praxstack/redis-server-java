@@ -93,6 +93,8 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `INCR key` | `INCR counter` | integer (new value) |
 | `DECR key` | `DECR counter` | integer (new value) |
 | `INCRBY` / `DECRBY` | `INCRBY c 10` | integer (new value) |
+| `APPEND key value` | `APPEND k xy` | integer (new UTF-8 length) |
+| `STRLEN key` | `STRLEN k` | integer |
 | `EXISTS key [key ...]` | `EXISTS a b` | integer (# present) |
 | `MGET key [key ...]` | `MGET a b` | array of bulks / nils |
 | `MSET key value [key value ...]` | `MSET a 1 b 2` | `+OK` |

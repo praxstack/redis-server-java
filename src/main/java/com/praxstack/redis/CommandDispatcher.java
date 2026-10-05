@@ -38,6 +38,8 @@ public final class CommandDispatcher {
         handlers.put("DECR", this::handleDecr);
         handlers.put("INCRBY", this::handleIncrBy);
         handlers.put("DECRBY", this::handleDecrBy);
+        handlers.put("APPEND", this::handleAppend);
+        handlers.put("STRLEN", this::handleStrlen);
         handlers.put("EXISTS", this::handleExists);
         handlers.put("COMMAND", args -> RespEncoder.emptyArray());
         handlers.put("CONFIG", args -> RespEncoder.emptyArray());
@@ -154,6 +156,16 @@ public final class CommandDispatcher {
     private byte[] handleDecrBy(List<String> args) {
         if (args.size() != 3) return RespEncoder.error("ERR wrong number of arguments for 'decrby'");
         return RespEncoder.integer(store.incrBy(args.get(1), Math.negateExact(Long.parseLong(args.get(2)))));
+    }
+
+    private byte[] handleAppend(List<String> args) {
+        if (args.size() != 3) return RespEncoder.error("ERR wrong number of arguments for 'append'");
+        return RespEncoder.integer(store.append(args.get(1), args.get(2)));
+    }
+
+    private byte[] handleStrlen(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'strlen'");
+        return RespEncoder.integer(store.strlen(args.get(1)));
     }
 
     private byte[] handleExists(List<String> args) {

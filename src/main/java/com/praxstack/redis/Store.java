@@ -1,6 +1,7 @@
 package com.praxstack.redis;
 
 import java.time.Instant;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -151,6 +152,24 @@ public final class Store {
             return false;
         }
         return map.replace(key, v, StoredValue.of(v.value()));
+    }
+
+    /**
+     * Append {@code suffix} to the key (creating it if missing). Returns the new
+     * UTF-8 byte length. Preserves an existing TTL.
+     */
+    public int append(String key, String suffix) {
+        StoredValue updated = map.compute(key, (k, existing) -> {
+            if (existing == null || existing.isExpired()) {
+                return StoredValue.of(suffix);
+            }
+            return new StoredValue(existing.value() + suffix, existing.expiresAt());
+        });
+        return updated.value().getBytes(StandardCharsets.UTF_8).length;
+    }
+
+    public int strlen(String key) {
+        return get(key).map(s -> s.getBytes(StandardCharsets.UTF_8).length).orElse(0);
     }
 
     public boolean exists(String key) {

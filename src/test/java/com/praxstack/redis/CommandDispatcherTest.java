@@ -75,6 +75,16 @@ class CommandDispatcherTest {
     }
 
     @Test
+    void appendAndStrlenUseUtf8ByteLength() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals(":0\r\n", dispatch(d, "STRLEN", "k"));
+        assertEquals(":5\r\n", dispatch(d, "APPEND", "k", "hello"));
+        assertEquals(":7\r\n", dispatch(d, "APPEND", "k", "é"));
+        assertEquals(":7\r\n", dispatch(d, "STRLEN", "k"));
+        assertEquals("$7\r\nhelloé\r\n", dispatch(d, "GET", "k"));
+    }
+
+    @Test
     void unknownCommandReturnsError() {
         CommandDispatcher d = new CommandDispatcher(new Store());
         String out = dispatch(d, "FOOBAR");
