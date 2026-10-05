@@ -75,6 +75,13 @@ class StoreTest {
     }
 
     @Test
+    void incrBySupportsNegativeDeltas() {
+        Store store = new Store();
+        assertEquals(10L, store.incrBy("c", 10L));
+        assertEquals(7L, store.incrBy("c", -3L));
+    }
+
+    @Test
     void incrPreservesTtl() throws InterruptedException {
         Store store = new Store();
         store.setWithTtlMillis("k", "5", 200);

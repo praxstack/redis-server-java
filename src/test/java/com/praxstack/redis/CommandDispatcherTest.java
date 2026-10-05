@@ -67,6 +67,14 @@ class CommandDispatcherTest {
     }
 
     @Test
+    void decrAndIncrByStep() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals(":-1\r\n", dispatch(d, "DECR", "c"));
+        assertEquals(":9\r\n", dispatch(d, "INCRBY", "c", "10"));
+        assertEquals(":4\r\n", dispatch(d, "DECRBY", "c", "5"));
+    }
+
+    @Test
     void unknownCommandReturnsError() {
         CommandDispatcher d = new CommandDispatcher(new Store());
         String out = dispatch(d, "FOOBAR");

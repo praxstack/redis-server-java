@@ -81,6 +81,17 @@ public final class Store {
      * @throws NumberFormatException if the existing value is not an integer
      */
     public long incr(String key) {
+        return incrBy(key, 1L);
+    }
+
+    /**
+     * Atomically add {@code delta} to the integer value of a key.
+     *
+     * @return the new value
+     * @throws NumberFormatException if the existing value is not an integer
+     * @throws ArithmeticException   if the result overflows a signed 64-bit integer
+     */
+    public long incrBy(String key, long delta) {
         StoredValue updated = map.compute(key, (k, existing) -> {
             long base = 0L;
             long expiresAt = StoredValue.NO_EXPIRY;
@@ -88,7 +99,7 @@ public final class Store {
                 base = Long.parseLong(existing.value());
                 expiresAt = existing.expiresAt();
             }
-            long next = Math.addExact(base, 1L);
+            long next = Math.addExact(base, delta);
             return new StoredValue(Long.toString(next), expiresAt);
         });
         return Long.parseLong(updated.value());

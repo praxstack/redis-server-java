@@ -35,6 +35,9 @@ public final class CommandDispatcher {
         handlers.put("GET", this::handleGet);
         handlers.put("DEL", this::handleDel);
         handlers.put("INCR", this::handleIncr);
+        handlers.put("DECR", this::handleDecr);
+        handlers.put("INCRBY", this::handleIncrBy);
+        handlers.put("DECRBY", this::handleDecrBy);
         handlers.put("EXISTS", this::handleExists);
         handlers.put("COMMAND", args -> RespEncoder.emptyArray());
         handlers.put("CONFIG", args -> RespEncoder.emptyArray());
@@ -136,6 +139,21 @@ public final class CommandDispatcher {
         if (args.size() < 2) return RespEncoder.error("ERR wrong number of arguments for 'incr'");
         long v = store.incr(args.get(1));
         return RespEncoder.integer(v);
+    }
+
+    private byte[] handleDecr(List<String> args) {
+        if (args.size() < 2) return RespEncoder.error("ERR wrong number of arguments for 'decr'");
+        return RespEncoder.integer(store.incrBy(args.get(1), -1L));
+    }
+
+    private byte[] handleIncrBy(List<String> args) {
+        if (args.size() != 3) return RespEncoder.error("ERR wrong number of arguments for 'incrby'");
+        return RespEncoder.integer(store.incrBy(args.get(1), Long.parseLong(args.get(2))));
+    }
+
+    private byte[] handleDecrBy(List<String> args) {
+        if (args.size() != 3) return RespEncoder.error("ERR wrong number of arguments for 'decrby'");
+        return RespEncoder.integer(store.incrBy(args.get(1), Math.negateExact(Long.parseLong(args.get(2)))));
     }
 
     private byte[] handleExists(List<String> args) {
