@@ -89,6 +89,21 @@ class ServerIntegrationTest {
     }
 
     @Test
+    void quitClosesConnectionAfterOk() throws IOException {
+        try (Socket s = new Socket("127.0.0.1", server.boundPort())) {
+            s.setSoTimeout(2000);
+            OutputStream out = s.getOutputStream();
+            out.write("*1\r\n$4\r\nQUIT\r\n".getBytes(StandardCharsets.UTF_8));
+            out.flush();
+            byte[] buf = new byte[16];
+            int n = s.getInputStream().read(buf);
+            assertEquals("+OK\r\n", new String(buf, 0, n, StandardCharsets.UTF_8));
+            int eof = s.getInputStream().read();
+            assertEquals(-1, eof);
+        }
+    }
+
+    @Test
     void pxExpiryRemovesKey() throws IOException, InterruptedException {
         // SET k v PX 50
         try (Socket s = new Socket("127.0.0.1", server.boundPort())) {

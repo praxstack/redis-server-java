@@ -50,6 +50,7 @@ public final class CommandDispatcher {
         handlers.put("TYPE", this::handleType);
         handlers.put("KEYS", this::handleKeys);
         handlers.put("INFO", this::handleInfo);
+        handlers.put("QUIT", args -> RespEncoder.ok());
         handlers.put("MGET", this::handleMget);
         handlers.put("MSET", this::handleMset);
         handlers.put("EXPIRE", this::handleExpire);

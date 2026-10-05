@@ -37,6 +37,8 @@ public final class Server implements AutoCloseable {
     private static final Logger LOG = Logger.getLogger(Server.class.getName());
     private static final int DEFAULT_PORT = 6379;
     private static final int DEFAULT_WORKER_THREADS = 100;
+    /** Idle clients release worker threads after this read timeout. */
+    static final int DEFAULT_SO_TIMEOUT_MS = 5 * 60 * 1000;
     /** Pending client handlers = 2× worker threads; excess connections are rejected. */
     static final int DEFAULT_QUEUE_CAPACITY_MULTIPLIER = 2;
 
@@ -104,6 +106,7 @@ public final class Server implements AutoCloseable {
             try {
                 Socket client = serverSocket.accept();
                 client.setTcpNoDelay(true);
+                client.setSoTimeout(DEFAULT_SO_TIMEOUT_MS);
                 try {
                     workers.submit(new ClientHandler(client, dispatcher));
                 } catch (RejectedExecutionException ex) {

@@ -258,4 +258,10 @@ class CommandDispatcherTest {
         String sectioned = dispatch(d, "INFO", "server");
         assertTrue(sectioned.contains("redis_version:1.0.0"), sectioned);
     }
+
+    @Test
+    void quitReturnsOk() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+OK\r\n", dispatch(d, "QUIT"));
+    }
 }

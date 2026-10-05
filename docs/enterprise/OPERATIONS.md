@@ -69,6 +69,7 @@ Documented results in root `README.md`.
 | Worker threads | `Server.DEFAULT_WORKER_THREADS` | 100 |
 | Queue multiplier | `Server.DEFAULT_QUEUE_CAPACITY_MULTIPLIER` | 2 |
 | Bulk string max | `RespParser.DEFAULT_MAX_BULK_STRING_BYTES` | 512 KiB |
+| Client idle timeout | `Server.DEFAULT_SO_TIMEOUT_MS` | 5 minutes |
 | Expiry sweep interval | `ExpiryManager.SWEEP_INTERVAL_MS` | 100 ms |
 
 No external config file — change via constructor args or constants for now.

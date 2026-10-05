@@ -33,6 +33,11 @@ public final class ClientHandler implements Runnable {
             RespParser parser = new RespParser(in);
             List<String> args;
             while ((args = parser.next()) != null) {
+                if (!args.isEmpty() && "QUIT".equalsIgnoreCase(args.get(0))) {
+                    out.write(RespEncoder.ok());
+                    out.flush();
+                    break;
+                }
                 byte[] response = dispatcher.dispatch(args);
                 out.write(response);
                 out.flush();
