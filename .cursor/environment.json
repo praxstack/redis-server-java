@@ -5,6 +5,7 @@
     "dockerfile": "Dockerfile"
   },
   "install": "./scripts/cloud-agent-install.sh",
+  "start": "echo redis-server-java-cloud-agent-start",
   "terminals": [
     {
       "name": "Redis Server",

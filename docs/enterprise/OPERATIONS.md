@@ -61,6 +61,8 @@ Documented results in root `README.md`.
 
 `scripts/cloud-agent-install.sh` runs `mvn clean package -DskipTests` for environment bootstrap. CI is the authoritative test gate.
 
+`.cursor/environment.json` must include a `start` field. Cloud Agent **terminals are ignored when `start` is absent**. The current `start` is an idempotent marker so the Redis Server terminal (port 6379) actually launches. The Dockerfile (`eclipse-temurin:17-jdk-jammy`) installs Maven and `redis-tools`; agents that boot from the default image without a finished environment build will not have `mvn` until that image is used.
+
 ## Configuration knobs (code-level)
 
 | Constant | Location | Default |
