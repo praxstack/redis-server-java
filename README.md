@@ -106,6 +106,7 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `FLUSHDB` / `FLUSHALL` | `FLUSHDB` | `+OK` |
 | `TYPE key` | `TYPE k` | `string` or `none` |
 | `KEYS pattern` | `KEYS user:*` | array of matching keys |
+| `INFO [section]` | `INFO` | bulk string (Server/Keyspace) |
 | `COMMAND` / `CONFIG GET` | | empty array (stub) |
 
 ---

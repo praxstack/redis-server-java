@@ -246,4 +246,16 @@ class CommandDispatcherTest {
         assertFalse(after.contains("user:x"), after);
         assertEquals("*0\r\n", dispatch(d, "KEYS", "nope*"));
     }
+
+    @Test
+    void infoContainsVersionAndKeyspace() {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "k", "v");
+        String info = dispatch(d, "INFO");
+        assertTrue(info.startsWith("$"), info);
+        assertTrue(info.contains("redis_version:1.0.0"), info);
+        assertTrue(info.contains("db0:keys=1"), info);
+        String sectioned = dispatch(d, "INFO", "server");
+        assertTrue(sectioned.contains("redis_version:1.0.0"), sectioned);
+    }
 }

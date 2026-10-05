@@ -82,6 +82,13 @@ class ServerIntegrationTest {
     }
 
     @Test
+    void infoOverSocketContainsVersion() throws IOException {
+        String resp = sendAndRead("*1\r\n$4\r\nINFO\r\n");
+        assertTrue(resp.contains("redis_version:1.0.0"), resp);
+        assertTrue(resp.contains("db0:keys="), resp);
+    }
+
+    @Test
     void pxExpiryRemovesKey() throws IOException, InterruptedException {
         // SET k v PX 50
         try (Socket s = new Socket("127.0.0.1", server.boundPort())) {

@@ -49,6 +49,7 @@ public final class CommandDispatcher {
         handlers.put("FLUSHALL", this::handleFlush);
         handlers.put("TYPE", this::handleType);
         handlers.put("KEYS", this::handleKeys);
+        handlers.put("INFO", this::handleInfo);
         handlers.put("MGET", this::handleMget);
         handlers.put("MSET", this::handleMset);
         handlers.put("EXPIRE", this::handleExpire);
@@ -247,5 +248,22 @@ public final class CommandDispatcher {
     private byte[] handleKeys(List<String> args) {
         if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'keys'");
         return RespEncoder.bulkArray(store.keys(args.get(1)));
+    }
+
+    private byte[] handleInfo(List<String> args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("# Server\r\n");
+        sb.append("redis_version:1.0.0\r\n");
+        sb.append("os:").append(System.getProperty("os.name")).append("\r\n");
+        sb.append("arch_bits:").append(System.getProperty("os.arch")).append("\r\n");
+        sb.append("process_id:").append(ProcessHandle.current().pid()).append("\r\n");
+        sb.append("tcp_port:6379\r\n");
+        sb.append("\r\n# Clients\r\n");
+        sb.append("connected_clients:0\r\n");
+        sb.append("\r\n# Stats\r\n");
+        sb.append("total_commands_processed:0\r\n");
+        sb.append("\r\n# Keyspace\r\n");
+        sb.append("db0:keys=").append(store.liveSize()).append("\r\n");
+        return RespEncoder.bulkString(sb.toString());
     }
 }
