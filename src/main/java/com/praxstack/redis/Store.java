@@ -206,6 +206,11 @@ public final class Store {
         map.clear();
     }
 
+    /** Redis TYPE: {@code string} if present, {@code none} if missing/expired. */
+    public String type(String key) {
+        return exists(key) ? "string" : "none";
+    }
+
     /** Used by {@link ExpiryManager} to purge keys that have crossed their TTL. */
     int purgeExpired() {
         long now = Instant.now().toEpochMilli();

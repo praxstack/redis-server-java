@@ -47,6 +47,7 @@ public final class CommandDispatcher {
         handlers.put("DBSIZE", args -> RespEncoder.integer(store.liveSize()));
         handlers.put("FLUSHDB", this::handleFlush);
         handlers.put("FLUSHALL", this::handleFlush);
+        handlers.put("TYPE", this::handleType);
         handlers.put("MGET", this::handleMget);
         handlers.put("MSET", this::handleMset);
         handlers.put("EXPIRE", this::handleExpire);
@@ -235,5 +236,10 @@ public final class CommandDispatcher {
     private byte[] handleFlush(List<String> args) {
         store.flush();
         return RespEncoder.ok();
+    }
+
+    private byte[] handleType(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'type'");
+        return RespEncoder.simpleString(store.type(args.get(1)));
     }
 }

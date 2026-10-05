@@ -215,4 +215,15 @@ class CommandDispatcherTest {
         assertEquals("+OK\r\n", dispatch(d, "FLUSHALL"));
         assertEquals(":0\r\n", dispatch(d, "DBSIZE"));
     }
+
+    @Test
+    void typeReturnsStringOrNone() throws InterruptedException {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals("+none\r\n", dispatch(d, "TYPE", "k"));
+        dispatch(d, "SET", "k", "v");
+        assertEquals("+string\r\n", dispatch(d, "TYPE", "k"));
+        dispatch(d, "PEXPIRE", "k", "30");
+        Thread.sleep(80L);
+        assertEquals("+none\r\n", dispatch(d, "TYPE", "k"));
+    }
 }
