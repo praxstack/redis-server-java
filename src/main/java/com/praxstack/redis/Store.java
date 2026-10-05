@@ -189,7 +189,21 @@ public final class Store {
     }
 
     public int size() {
-        return map.size();
+        return liveSize();
+    }
+
+    /** Count of keys that have not expired. */
+    public int liveSize() {
+        long now = Instant.now().toEpochMilli();
+        int n = 0;
+        for (StoredValue v : map.values()) {
+            if (!v.isExpired(now)) n++;
+        }
+        return n;
+    }
+
+    public void flush() {
+        map.clear();
     }
 
     /** Used by {@link ExpiryManager} to purge keys that have crossed their TTL. */

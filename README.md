@@ -102,7 +102,8 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `EXPIRE` / `PEXPIRE` | `EXPIRE k 10` | integer 0/1 |
 | `TTL` / `PTTL` | `TTL k` | integer seconds/ms, -1, or -2 |
 | `PERSIST key` | `PERSIST k` | integer 0/1 |
-| `DBSIZE` | `DBSIZE` | integer |
+| `DBSIZE` | `DBSIZE` | integer (live keys) |
+| `FLUSHDB` / `FLUSHALL` | `FLUSHDB` | `+OK` |
 | `COMMAND` / `CONFIG GET` | | empty array (stub) |
 
 ---

@@ -160,8 +160,6 @@ class StoreTest {
         store.setWithTtlMillis("b", "2", 30);
         assertEquals(2, store.size());
         Thread.sleep(80);
-        // size() counts map entries until lazy purge; expired keys may linger briefly
-        store.purgeExpired();
         assertEquals(1, store.size());
     }
 }

@@ -200,4 +200,19 @@ class CommandDispatcherTest {
         assertEquals("$-1\r\n", dispatch(d, "GET", "k"));
         assertEquals("$-1\r\n", dispatch(d, "GETDEL", "k"));
     }
+
+    @Test
+    void flushDbClearsKeysAndDbsizeIgnoresExpired() throws InterruptedException {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        dispatch(d, "SET", "a", "1");
+        dispatch(d, "SET", "b", "2", "PX", "30");
+        assertEquals(":2\r\n", dispatch(d, "DBSIZE"));
+        Thread.sleep(80L);
+        assertEquals(":1\r\n", dispatch(d, "DBSIZE"));
+        assertEquals("+OK\r\n", dispatch(d, "FLUSHDB"));
+        assertEquals(":0\r\n", dispatch(d, "DBSIZE"));
+        dispatch(d, "SET", "c", "3");
+        assertEquals("+OK\r\n", dispatch(d, "FLUSHALL"));
+        assertEquals(":0\r\n", dispatch(d, "DBSIZE"));
+    }
 }

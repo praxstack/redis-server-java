@@ -44,7 +44,9 @@ public final class CommandDispatcher {
         handlers.put("EXISTS", this::handleExists);
         handlers.put("COMMAND", args -> RespEncoder.emptyArray());
         handlers.put("CONFIG", args -> RespEncoder.emptyArray());
-        handlers.put("DBSIZE", args -> RespEncoder.integer(store.size()));
+        handlers.put("DBSIZE", args -> RespEncoder.integer(store.liveSize()));
+        handlers.put("FLUSHDB", this::handleFlush);
+        handlers.put("FLUSHALL", this::handleFlush);
         handlers.put("MGET", this::handleMget);
         handlers.put("MSET", this::handleMset);
         handlers.put("EXPIRE", this::handleExpire);
@@ -228,5 +230,10 @@ public final class CommandDispatcher {
     private byte[] handleGetDel(List<String> args) {
         if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'getdel'");
         return store.getDel(args.get(1)).map(RespEncoder::bulkString).orElse(RespEncoder.nullBulk());
+    }
+
+    private byte[] handleFlush(List<String> args) {
+        store.flush();
+        return RespEncoder.ok();
     }
 }
