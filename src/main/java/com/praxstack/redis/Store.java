@@ -94,6 +94,54 @@ public final class Store {
         return Long.parseLong(updated.value());
     }
 
+    /**
+     * Remaining TTL in milliseconds. {@code -2} if missing/expired, {@code -1} if
+     * the key exists with no timeout.
+     */
+    public long pttl(String key) {
+        StoredValue v = map.get(key);
+        if (v == null) return -2L;
+        if (v.isExpired()) {
+            map.remove(key, v);
+            return -2L;
+        }
+        if (!v.hasExpiry()) return -1L;
+        return Math.max(0L, v.expiresAt() - Instant.now().toEpochMilli());
+    }
+
+    public long ttlSeconds(String key) {
+        long ms = pttl(key);
+        if (ms < 0) return ms;
+        return ms / 1000L;
+    }
+
+    /**
+     * Set a TTL on an existing key. Returns {@code false} if the key is missing.
+     * A non-positive TTL deletes the key (Redis EXPIRE ≤ 0 behavior).
+     */
+    public boolean expireMillis(String key, long ttlMillis) {
+        StoredValue v = map.get(key);
+        if (v == null || v.isExpired()) {
+            if (v != null) map.remove(key, v);
+            return false;
+        }
+        if (ttlMillis <= 0) {
+            map.remove(key, v);
+            return true;
+        }
+        return map.replace(key, v, StoredValue.withTtlMillis(v.value(), ttlMillis));
+    }
+
+    /** Remove expiry from a key. Returns {@code false} if missing or already persistent. */
+    public boolean persist(String key) {
+        StoredValue v = map.get(key);
+        if (v == null || v.isExpired() || !v.hasExpiry()) {
+            if (v != null && v.isExpired()) map.remove(key, v);
+            return false;
+        }
+        return map.replace(key, v, StoredValue.of(v.value()));
+    }
+
     public boolean exists(String key) {
         return get(key).isPresent();
     }

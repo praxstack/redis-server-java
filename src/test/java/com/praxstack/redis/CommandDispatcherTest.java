@@ -155,4 +155,22 @@ class CommandDispatcherTest {
         String out = dispatch(d, "MGET");
         assertTrue(out.startsWith("-ERR wrong number of arguments"), out);
     }
+
+    @Test
+    void expireAndTtlRoundTrip() throws InterruptedException {
+        CommandDispatcher d = new CommandDispatcher(new Store());
+        assertEquals(":0\r\n", dispatch(d, "EXPIRE", "missing", "10"));
+        dispatch(d, "SET", "k", "v");
+        assertEquals(":1\r\n", dispatch(d, "PEXPIRE", "k", "200"));
+        String pttl = dispatch(d, "PTTL", "k");
+        assertTrue(pttl.startsWith(":"), pttl);
+        long remaining = Long.parseLong(pttl.substring(1).trim());
+        assertTrue(remaining > 0 && remaining <= 200, pttl);
+        assertEquals(":1\r\n", dispatch(d, "PERSIST", "k"));
+        assertEquals(":-1\r\n", dispatch(d, "TTL", "k"));
+        assertEquals(":0\r\n", dispatch(d, "PERSIST", "k"));
+        dispatch(d, "PEXPIRE", "k", "40");
+        Thread.sleep(80L);
+        assertEquals(":-2\r\n", dispatch(d, "TTL", "k"));
+    }
 }

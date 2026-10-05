@@ -94,6 +94,9 @@ Every design choice was made to force a conversation about a Java concurrency pr
 | `EXISTS key [key ...]` | `EXISTS a b` | integer (# present) |
 | `MGET key [key ...]` | `MGET a b` | array of bulks / nils |
 | `MSET key value [key value ...]` | `MSET a 1 b 2` | `+OK` |
+| `EXPIRE` / `PEXPIRE` | `EXPIRE k 10` | integer 0/1 |
+| `TTL` / `PTTL` | `TTL k` | integer seconds/ms, -1, or -2 |
+| `PERSIST key` | `PERSIST k` | integer 0/1 |
 | `DBSIZE` | `DBSIZE` | integer |
 | `COMMAND` / `CONFIG GET` | | empty array (stub) |
 

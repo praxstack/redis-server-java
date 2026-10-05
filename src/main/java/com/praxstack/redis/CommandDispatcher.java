@@ -41,6 +41,11 @@ public final class CommandDispatcher {
         handlers.put("DBSIZE", args -> RespEncoder.integer(store.size()));
         handlers.put("MGET", this::handleMget);
         handlers.put("MSET", this::handleMset);
+        handlers.put("EXPIRE", this::handleExpire);
+        handlers.put("PEXPIRE", this::handlePexpire);
+        handlers.put("TTL", this::handleTtl);
+        handlers.put("PTTL", this::handlePttl);
+        handlers.put("PERSIST", this::handlePersist);
     }
 
     public byte[] dispatch(List<String> args) {
@@ -159,5 +164,33 @@ public final class CommandDispatcher {
             store.set(args.get(i), args.get(i + 1));
         }
         return RespEncoder.ok();
+    }
+
+    private byte[] handleExpire(List<String> args) {
+        if (args.size() != 3) return RespEncoder.error("ERR wrong number of arguments for 'expire'");
+        long seconds = Long.parseLong(args.get(2));
+        boolean ok = store.expireMillis(args.get(1), Math.multiplyExact(seconds, 1000L));
+        return RespEncoder.integer(ok ? 1 : 0);
+    }
+
+    private byte[] handlePexpire(List<String> args) {
+        if (args.size() != 3) return RespEncoder.error("ERR wrong number of arguments for 'pexpire'");
+        boolean ok = store.expireMillis(args.get(1), Long.parseLong(args.get(2)));
+        return RespEncoder.integer(ok ? 1 : 0);
+    }
+
+    private byte[] handleTtl(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'ttl'");
+        return RespEncoder.integer(store.ttlSeconds(args.get(1)));
+    }
+
+    private byte[] handlePttl(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'pttl'");
+        return RespEncoder.integer(store.pttl(args.get(1)));
+    }
+
+    private byte[] handlePersist(List<String> args) {
+        if (args.size() != 2) return RespEncoder.error("ERR wrong number of arguments for 'persist'");
+        return RespEncoder.integer(store.persist(args.get(1)) ? 1 : 0);
     }
 }

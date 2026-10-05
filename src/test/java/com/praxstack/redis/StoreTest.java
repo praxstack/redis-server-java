@@ -116,6 +116,23 @@ class StoreTest {
     }
 
     @Test
+    void pttlAndPersist() throws InterruptedException {
+        Store store = new Store();
+        assertEquals(-2L, store.pttl("missing"));
+        store.set("k", "v");
+        assertEquals(-1L, store.pttl("k"));
+        assertTrue(store.expireMillis("k", 500));
+        long remaining = store.pttl("k");
+        assertTrue(remaining > 0 && remaining <= 500);
+        assertTrue(store.persist("k"));
+        assertEquals(-1L, store.pttl("k"));
+        assertFalse(store.persist("k"));
+        store.expireMillis("k", 30);
+        Thread.sleep(80);
+        assertEquals(-2L, store.ttlSeconds("k"));
+    }
+
+    @Test
     void purgeExpiredRemovesStaleKeys() throws InterruptedException {
         Store store = new Store();
         store.setWithTtlMillis("a", "1", 30);
